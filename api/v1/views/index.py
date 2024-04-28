@@ -28,7 +28,7 @@ def status():
 @app_views.route("/stats", methods=['GET'], strict_slashes=False)
 def stats():
     """
-    stats of all objs route
+    The status of all objs route
     :return: json of all objs
     """
     data = {

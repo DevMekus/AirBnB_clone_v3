@@ -11,45 +11,45 @@ from models.review import Review
                  strict_slashes=False)
 def reviews_by_place(place_id):
     """
-    retrieves all Review objects by place
+    Function retrieves all Review objects by place
     :return: json of all reviews
     """
-    review_list = []
-    place_obj = storage.get("Place", str(place_id))
+    reviewList = []
+    placeObj = storage.get("Place", str(place_id))
 
-    if place_obj is None:
+    if placeObj is None:
         abort(404)
 
-    for obj in place_obj.reviews:
-        review_list.append(obj.to_json())
+    for obj in placeObj.reviews:
+        reviewList.append(obj.to_json())
 
-    return jsonify(review_list)
+    return jsonify(reviewList)
 
 
 @app_views.route("/places/<place_id>/reviews", methods=["POST"],
                  strict_slashes=False)
 def review_create(place_id):
     """
-    create REview route
+    Function create Review route
     :return: newly created Review obj
     """
-    review_json = request.get_json(silent=True)
-    if review_json is None:
+    reviewJson = request.get_json(silent=True)
+    if reviewJson is None:
         abort(400, 'Not a JSON')
     if not storage.get("Place", place_id):
         abort(404)
-    if not storage.get("User", review_json["user_id"]):
+    if not storage.get("User", reviewJson["user_id"]):
         abort(404)
-    if "user_id" not in review_json:
+    if "user_id" not in reviewJson:
         abort(400, 'Missing user_id')
-    if "text" not in review_json:
+    if "text" not in reviewJson:
         abort(400, 'Missing text')
 
-    review_json["place_id"] = place_id
+    reviewJson["place_id"] = place_id
 
-    new_review = Review(**review_json)
-    new_review.save()
-    resp = jsonify(new_review.to_json())
+    newReview = Review(**reviewJson)
+    newReview.save()
+    resp = jsonify(newReview.to_json())
     resp.status_code = 201
 
     return resp
@@ -59,62 +59,62 @@ def review_create(place_id):
                  strict_slashes=False)
 def review_by_id(review_id):
     """
-    gets a specific Review object by ID
+    Function that gets a specific Review object by ID
     :param review_id: place object id
     :return: review obj with the specified id or error
     """
 
-    fetched_obj = storage.get("Review", str(review_id))
+    fetchedObj = storage.get("Review", str(review_id))
 
-    if fetched_obj is None:
+    if fetchedObj is None:
         abort(404)
 
-    return jsonify(fetched_obj.to_json())
+    return jsonify(fetchedObj.to_json())
 
 
 @app_views.route("/reviews/<review_id>",  methods=["PUT"],
                  strict_slashes=False)
 def review_put(review_id):
     """
-    updates specific Review object by ID
+    Function that updates specific Review object by ID
     :param review_id: Review object ID
     :return: Review object and 200 on success, or 400 or 404 on failure
     """
-    place_json = request.get_json(silent=True)
+    placeJson = request.get_json(silent=True)
 
-    if place_json is None:
+    if placeJson is None:
         abort(400, 'Not a JSON')
 
-    fetched_obj = storage.get("Review", str(review_id))
+    fetchedObj = storage.get("Review", str(review_id))
 
-    if fetched_obj is None:
+    if fetchedObj is None:
         abort(404)
 
-    for key, val in place_json.items():
+    for key, val in placeJson.items():
         if key not in ["id", "created_at", "updated_at", "user_id",
                        "place_id"]:
-            setattr(fetched_obj, key, val)
+            setattr(fetchedObj, key, val)
 
-    fetched_obj.save()
+    fetchedObj.save()
 
-    return jsonify(fetched_obj.to_json())
+    return jsonify(fetchedObj.to_json())
 
 
 @app_views.route("/reviews/<review_id>",  methods=["DELETE"],
                  strict_slashes=False)
 def review_delete_by_id(review_id):
     """
-    deletes Review by id
+    Function that deletes Review by id
     :param : Review object id
     :return: empty dict with 200 or 404 if not found
     """
 
-    fetched_obj = storage.get("Review", str(review_id))
+    fetchedObj = storage.get("Review", str(review_id))
 
-    if fetched_obj is None:
+    if fetchedObj is None:
         abort(404)
 
-    storage.delete(fetched_obj)
+    storage.delete(fetchedObj)
     storage.save()
 
     return jsonify({})
